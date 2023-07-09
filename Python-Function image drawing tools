@@ -1,0 +1,78 @@
+# 导入必要的模块
+import matplotlib.pyplot as plt
+import numpy as np
+import sympy as sp
+
+# 定义一个函数，根据用户输入的函数解析式，绘制函数图像，并分析函数的极值、奇偶性等信息
+def plot_function(expression):
+    # 将用户输入的字符串转换为sympy表达式对象
+    x = sp.Symbol('x')
+    f = sp.sympify(expression)
+    
+    # 计算函数的导数和二阶导数
+    f_prime = sp.diff(f, x)
+    f_double_prime = sp.diff(f_prime, x)
+    
+    # 求解函数的零点、极值点和拐点
+    zeros = sp.solve(f, x)
+    extrema = sp.solve(f_prime, x)
+    inflections = sp.solve(f_double_prime, x)
+    
+    # 判断函数的奇偶性和单调性
+    if f.subs(x, -x) == f:
+        parity = '偶函数'
+    elif f.subs(x, -x) == -f:
+        parity = '奇函数'
+    else:
+        parity = '非奇非偶函数'
+    
+    if f_prime > 0:
+        monotonicity = '单调递增'
+    elif f_prime < 0:
+        monotonicity = '单调递减'
+    else:
+        monotonicity = '非单调'
+    
+    # 打印函数的相关信息
+    print(f'你输入的函数是：{f}')
+    print(f'该函数是{parity}，{monotonicity}')
+    print(f'该函数的零点有：{zeros}')
+    print(f'该函数的极值点有：{extrema}')
+    print(f'该函数的拐点有：{inflections}')
+    
+    # 绘制函数图像
+    # 创建一个画布对象，设置窗口大小为显示器大小
+    fig = plt.figure(figsize=(plt.rcParams['figure.figsize'][0]*2, plt.rcParams['figure.figsize'][1]*2))
+    
+    # 创建一个子图对象，设置坐标轴范围和标题
+    ax = fig.add_subplot(111)
+    ax.set_xlim(-10, 10)
+    ax.set_ylim(-10, 10)
+    ax.set_title(f'函数{f}的图像')
+    
+    # 生成x和y的数据点，用numpy数组表示
+    x_data = np.linspace(-10, 10, 1000)
+    y_data = [f.subs(x, i) for i in x_data]
+    
+    # 绘制函数曲线，设置颜色和线宽
+    ax.plot(x_data, y_data, color='blue', linewidth=2)
+    
+    # 绘制零点、极值点和拐点，用不同的颜色和形状表示，并添加标签
+    for z in zeros:
+        ax.scatter(z, 0, color='red', marker='o', label='零点')
+    
+    for e in extrema:
+        ax.scatter(e, f.subs(x, e), color='green', marker='s', label='极值点')
+    
+    for i in inflections:
+        ax.scatter(i, f.subs(x, i), color='yellow', marker='^', label='拐点')
+    
+    # 显示图例和网格线
+    ax.legend()
+    ax.grid()
+    
+    # 显示图像
+    plt.show()
+
+# 调用函数，输入用户想要绘制的函数解析式，例如：x**3 - 3*x**2 + 2*x - 1
+plot_function(input('请输入你想要绘制的函数解析式：'))
